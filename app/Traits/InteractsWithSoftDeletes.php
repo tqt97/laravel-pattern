@@ -3,15 +3,23 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use LogicException;
 
 trait InteractsWithSoftDeletes
 {
+    protected function ensureSoftDeletes(Model $model): void
+    {
+        if (! in_array(SoftDeletes::class, class_uses_recursive($model))) {
+            throw new LogicException(
+                sprintf('%s does not use SoftDeletes.', $model::class)
+            );
+        }
+    }
+
     public function restore(Model $model): void
     {
-        if (! method_exists($model, 'restore')) {
-            throw new LogicException('Model does not support soft deletes.');
-        }
+        $this->ensureSoftDeletes($model);
 
         if (! $model->trashed()) {
             return;
@@ -22,15 +30,8 @@ trait InteractsWithSoftDeletes
 
     public function forceDelete(Model $model): void
     {
-        if (! method_exists($model, 'forceDelete')) {
-            throw new LogicException('Model does not support soft deletes.');
-        }
+        $this->ensureSoftDeletes($model);
 
         $model->forceDelete();
-    }
-
-    public function findWithTrashed(int|string $id): ?Model
-    {
-        return $this->query()->withTrashed()->find($id);
     }
 }

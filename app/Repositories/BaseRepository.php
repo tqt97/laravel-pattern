@@ -37,7 +37,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * Updates a model with a given id.
+     * Updates the given model instance with the provided attributes.
      */
     public function update(Model $model, array $attributes): Model
     {
@@ -48,7 +48,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * Deletes a model with a given id.
+     * Deletes the given model instance.
      */
     public function delete(Model $model): void
     {
